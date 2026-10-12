@@ -1,3 +1,32 @@
+# Dependencies
 node_modules/
+
+# Logs
 logs/
+*.log
+npm-debug.log*
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Credential files
+config/credentials.json
+credentials.json
+
+# Build files
 dist/
+build/
+
+# Temporary files
+tmp/
+temp/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Code editors
+.vscode/
+.idea/

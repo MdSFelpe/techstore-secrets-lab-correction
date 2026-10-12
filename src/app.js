@@ -1,20 +1,23 @@
-app.get("/health", (req, res) => {
+require('dotenv').config();
+
+const express = require('express');
+
+const app = express();
+const PORT = Number(process.env.PORT) || 3000;
+
+app.get('/health', (req, res) => {
     res.json({
-        status: "healthy",
-        database: database.host
+        status: 'healthy'
     });
 });
 
-
-app.get("/config-check", (req, res) => {
+app.get('/config-check', (req, res) => {
     res.json({
-        database: database.database,
-        adminConfigured: Boolean(senhaUsuarioTeste123),
-        paymentConfigured: Boolean(chaveAPI111222333444555777888999000),
-        internalApiConfigured: Boolean(tokenInterno1234567890),
+        adminConfigured: Boolean(process.env.ADMIN_PASSWORD),
+        paymentConfigured: Boolean(process.env.PAYMENT_API_KEY),
+        internalApiConfigured: Boolean(process.env.INTERNAL_TOKEN)
     });
 });
-
 
 app.listen(PORT, () => {
     console.log(`API Techstore is running on port ${PORT}`);

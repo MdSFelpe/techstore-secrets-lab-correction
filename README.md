@@ -360,3 +360,42 @@ Ao final da atividade, o repositório deverá representar uma versão mais segur
 - consideração sobre rotação e revogação de credenciais.
 
 O objetivo final é compreender que **gerenciar segredos não significa apenas esconder uma senha**, mas controlar todo o ciclo de vida das informações sensíveis dentro do ambiente DevOps.
+---
+
+## Melhorias de segurança realizadas
+
+As correções abaixo foram aplicadas durante a revisão do projeto.
+
+| Problema encontrado | Correção realizada | Justificativa |
+|---|---|---|
+| Credenciais do banco definidas diretamente no código | A configuração passou a utilizar `DB_USER` e `DB_PASSWORD` por variáveis de ambiente. | Evita manter credenciais diretamente no código-fonte. |
+| Arquivo `.env` incluído no Git | O arquivo foi removido do controle de versão e adicionado ao `.gitignore`. | Reduz o risco de publicar configurações sensíveis. |
+| Arquivo `config/credentials.json` incluído no Git | O arquivo foi removido do controle de versão e incluído no `.gitignore`. | Evita versionar arquivos de credenciais. |
+| Senhas definidas diretamente no Docker Compose | As configurações passaram a utilizar variáveis de ambiente. | Evita manter senhas fixas no arquivo de configuração. |
+| Script de backup podia expor informações sensíveis nos logs | O script deixou de imprimir a chave de API e passou a verificar se ela está configurada. | Evita divulgar segredos nos registros da aplicação. |
+| Endpoint de saúde retornava detalhes da configuração do banco | O endpoint `/health` passou a retornar apenas o estado da aplicação. | Reduz a exposição de informações internas. |
+| Endpoint `/config-check` utilizava referências inadequadas para verificar credenciais | A verificação passou a retornar apenas valores booleanos sobre a presença das variáveis. | Permite verificar a configuração sem revelar os valores dos segredos. |
+| Logs do banco exibiam usuário e nome da base | A mensagem foi substituída por uma confirmação genérica. | Reduz a exposição de informações internas nos logs. |
+| `.gitignore` não contemplava todos os arquivos sensíveis | Foram adicionadas regras para arquivos de ambiente, credenciais e arquivos temporários. | Reduz o risco de inclusão acidental desses arquivos no Git. |
+| Contexto de construção do Docker não possuía regras próprias de exclusão | Foi criado o `.dockerignore` para excluir arquivos de ambiente, dependências locais, histórico Git e credenciais. | Evita enviar arquivos desnecessários ou sensíveis ao contexto de construção. |
+
+### Boas práticas utilizadas
+
+- Utilização de variáveis de ambiente para configurar credenciais.
+- Separação entre `.env` local e `.env.example` com valores fictícios.
+- Exclusão de arquivos sensíveis do controle de versão.
+- Redução de informações internas expostas nos logs e endpoints.
+- Uso de `.gitignore` e `.dockerignore` para proteger arquivos.
+- Uso de `package-lock.json` para registrar as versões resolvidas das dependências.
+
+### Decisões técnicas
+
+As alterações foram limitadas ao gerenciamento de segredos, à redução da exposição de informações e à configuração do ambiente Docker. O objetivo foi melhorar a segurança sem adicionar funcionalidades desnecessárias.
+
+O arquivo `.env.example` serve como modelo de configuração e não deve conter credenciais reais.
+
+### Estratégia de gerenciamento de informações sensíveis
+
+As credenciais devem ser fornecidas por variáveis de ambiente e mantidas fora do código-fonte e dos arquivos versionados. Em ambientes reais, recomenda-se utilizar um gerenciador de segredos apropriado, aplicar o princípio do menor privilégio e rotacionar credenciais que tenham sido expostas.
+
+A remoção de arquivos do controle de versão não apaga automaticamente seu conteúdo do histórico Git. Se credenciais reais forem publicadas, elas devem ser revogadas ou substituídas.
